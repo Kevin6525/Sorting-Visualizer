@@ -1,12 +1,12 @@
 import React from 'react';
-import {getMergeSortAnimations} from '../sortingAlgorithms/sortingAlgorithms.js';
+import {getMergeSortAnimations, getQuickSortAnimations} from '../sortingAlgorithms/sortingAlgorithms.js';
 import './SortingVisualizer.css';
 
 // Change this value for the speed of the animations.
 const ANIMATION_SPEED_MS = 1;
 
 // Change this value for the number of bars (value) in the array.
-const NUMBER_OF_ARRAY_BARS = 310;
+const NUMBER_OF_ARRAY_BARS = 100;
 
 // This is the main color of the array bars.
 const PRIMARY_COLOR = 'turquoise';
@@ -26,11 +26,11 @@ export default class SortingVisualizer extends React.Component {
   componentDidMount() {
     this.resetArray();
   }
-
+// Reset the array to random values from 10 to 600. This range is defined for visibility.
   resetArray() {
     const array = [];
     for (let i = 0; i < NUMBER_OF_ARRAY_BARS; i++) {
-      array.push(randomIntFromInterval(5, 730));
+      array.push(randomIntFromInterval(10, 600));
     }
     this.setState({array});
   }
@@ -58,9 +58,33 @@ export default class SortingVisualizer extends React.Component {
       }
     }
   }
-
+// quickSort, heapSort, bubbleSort are all implemented by self
   quickSort() {
-    // We leave it as an exercise to the viewer of this code to implement this method.
+    const animations = getQuickSortAnimations(this.state.array);
+    for(let i = 0; i < animations.length; i ++)
+    {
+        // arrayBars holds all bars in array
+        // animations[i] is each pair of bars being compared
+        const arrayBars = document.getElementsByClassName('array-bar');
+        let [pivotBar, compBar, change] = animations[i];
+        //If a swap is not committed, we just highlight the pivot and the value we're comparing to
+        if(!change)
+        {
+          const pivotBarStyle = arrayBars[pivotBar].style;
+          const compBarStyle = arrayBars[compBar].style;
+          const color = i % 2 === 0 ? SECONDARY_COLOR : PRIMARY_COLOR;
+          setTimeout(() => {
+            pivotBarStyle.backgroundColor = color;
+            compBarStyle.backgroundColor = color;
+          }, i * ANIMATION_SPEED_MS);
+        } else {
+        // This is the case where a swap is happening. Simply set the bar's height to the second bar
+        setTimeout(() => {
+          const compBarStyle = arrayBars[compBar].style;
+          compBarStyle.height = `${pivotBar}px`;
+        }, i * ANIMATION_SPEED_MS);
+      }
+    }
   }
 
   heapSort() {
@@ -71,22 +95,9 @@ export default class SortingVisualizer extends React.Component {
     // We leave it as an exercise to the viewer of this code to implement this method.
   }
 
-  // NOTE: This method will only work if your sorting algorithms actually return
-  // the sorted arrays; if they return the animations (as they currently do), then
-  // this method will be broken.
-  testSortingAlgorithms() {
-    for (let i = 0; i < 100; i++) {
-      const array = [];
-      const length = randomIntFromInterval(1, 1000);
-      for (let i = 0; i < length; i++) {
-        array.push(randomIntFromInterval(-1000, 1000));
-      }
-      const javaScriptSortedArray = array.slice().sort((a, b) => a - b);
-      const mergeSortedArray = getMergeSortAnimations(array.slice());
-      console.log(arraysAreEqual(javaScriptSortedArray, mergeSortedArray));
-    }
-  }
 
+// Pass index for React syntax. Pass in array values and map them.
+// Set hight in style to the value of the item in the array, value reflects height
   render() {
     const {array} = this.state;
 
@@ -98,7 +109,7 @@ export default class SortingVisualizer extends React.Component {
             key={idx}
             style={{
               backgroundColor: PRIMARY_COLOR,
-              height: `${value}px`,
+              height: `${value}px`
             }}></div>
         ))}
         <button onClick={() => this.resetArray()}>Generate New Array</button>
@@ -106,9 +117,6 @@ export default class SortingVisualizer extends React.Component {
         <button onClick={() => this.quickSort()}>Quick Sort</button>
         <button onClick={() => this.heapSort()}>Heap Sort</button>
         <button onClick={() => this.bubbleSort()}>Bubble Sort</button>
-        <button onClick={() => this.testSortingAlgorithms()}>
-          Test Sorting Algorithms (BROKEN)
-        </button>
       </div>
     );
   }
@@ -118,14 +126,4 @@ export default class SortingVisualizer extends React.Component {
 function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function arraysAreEqual(arrayOne, arrayTwo) {
-  if (arrayOne.length !== arrayTwo.length) return false;
-  for (let i = 0; i < arrayOne.length; i++) {
-    if (arrayOne[i] !== arrayTwo[i]) {
-      return false;
-    }
-  }
-  return true;
 }
