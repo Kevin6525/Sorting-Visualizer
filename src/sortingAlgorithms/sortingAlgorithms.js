@@ -116,8 +116,8 @@ function doQuickSort(array, lowIndex, highIndex, animations)
           if(array[i] < pivotVal)
           {
             //Push two animations to swap bar heights (Use true to indicate a change)
-              animations.push([array[pivotIdx], i, true]);
-              animations.push([array[i], pivotIdx, true]);
+              animations.push([pivotIdx, array[i], true]);
+              animations.push([i, array[pivotIdx], true]);
               swap(array,i,pivotIdx);
               pivotIdx ++;
           }
@@ -126,8 +126,8 @@ function doQuickSort(array, lowIndex, highIndex, animations)
       //Reset the colors and commit the swap in bar heights
       animations.push([pivotIdx, highIndex, false]);
       animations.push([pivotIdx, highIndex, false]);
-      animations.push([array[pivotIdx], highIndex, true]);
-      animations.push([array[highIndex], pivotIdx, true]);
+      animations.push([pivotIdx, array[highIndex], true]);
+      animations.push([highIndex, array[pivotIdx], true]);
       swap(array, pivotIdx, highIndex);
       return pivotIdx;
   }
@@ -180,5 +180,29 @@ function doHeapSort(array, size, animations)
     animations.push([0, array[i], true]);
     swap(array, i, 0);
     heapify(array, i, 0, animations);
+  }
+}
+export function getBubbleSortAnimations(array) {
+  const animations = [];
+  if(array.length <= 1) return array;
+  let size = array.length;
+  doBubbleSort(array, size, animations);
+  return animations;
+}
+function doBubbleSort(array, size, animations)
+{
+  for(let i = 0; i < size - 1; i ++)
+  {
+    for(let k = 0; k < size - (i + 1); k ++)
+    {
+      animations.push([i, k, false]);
+      animations.push([i, k, false]);
+      if(array[k] > array[k + 1])
+      {
+        animations.push([k, array[k + 1], true]);
+        animations.push([k + 1, array[k], true]);
+        swap(array, k, k + 1);
+      }
+    }
   }
 }
