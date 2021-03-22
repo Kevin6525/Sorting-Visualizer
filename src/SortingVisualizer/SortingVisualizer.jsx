@@ -1,12 +1,12 @@
 import React from 'react';
-import {getHeapSortAnimations, getMergeSortAnimations, getQuickSortAnimations} from '../sortingAlgorithms/sortingAlgorithms.js';
+import {getBubbleSortAnimations, getHeapSortAnimations, getMergeSortAnimations, getQuickSortAnimations} from '../sortingAlgorithms/sortingAlgorithms.js';
 import './SortingVisualizer.css';
 
 // Change this value for the speed of the animations.
-const ANIMATION_SPEED_MS = 70;
+const ANIMATION_SPEED_MS = 1;
 
 // Change this value for the number of bars (value) in the array.
-const NUMBER_OF_ARRAY_BARS = 10;
+const NUMBER_OF_ARRAY_BARS = 150;
 
 // This is the main color of the array bars.
 const PRIMARY_COLOR = 'turquoise';
@@ -80,13 +80,13 @@ export default class SortingVisualizer extends React.Component {
         } else {
         // This is the case where a swap is happening. Simply set the bar's height to the second bar
         setTimeout(() => {
-          const compBarStyle = arrayBars[compBar].style;
-          compBarStyle.height = `${pivotBar}px`;
+          const pivotBarStyle = arrayBars[pivotBar].style;
+          pivotBarStyle.height = `${compBar}px`;
         }, i * ANIMATION_SPEED_MS);
       }
     }
   }
-
+// Below two animations follow same structure as above (names of bar different for clarity)
   heapSort() {
     const animations = getHeapSortAnimations(this.state.array);
     for(let i = 0; i < animations.length; i ++)
@@ -112,7 +112,27 @@ export default class SortingVisualizer extends React.Component {
   }
 
   bubbleSort() {
-    // We leave it as an exercise to the viewer of this code to implement this method.
+    const animations = getBubbleSortAnimations(this.state.array);
+    for(let i = 0; i < animations.length; i ++)
+    {
+      const arrayBars = document.getElementsByClassName('array-bar');
+      let [barOne, barTwo, change] = animations[i];
+      if(!change)
+      {
+        const barOneStyle = arrayBars[barOne].style;
+        const barTwoStyle = arrayBars[barTwo].style;
+        const color = i % 2 === 0 ? SECONDARY_COLOR : PRIMARY_COLOR;
+        setTimeout(() => {
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
+        }, i * ANIMATION_SPEED_MS);
+      } else {
+        setTimeout(() => {
+          const barOneStyle = arrayBars[barOne].style;
+          barOneStyle.height = `${barTwo}px`;
+        }, i * ANIMATION_SPEED_MS);
+      }
+    }
   }
 
 
